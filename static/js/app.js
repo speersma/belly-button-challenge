@@ -18,17 +18,15 @@ function make_plot() {
         // creating array of the names in the json
         let names = data.names;
 
-        // pull elements from name array
+        // pull each name from name array
         names.forEach((name) => {
             // appending each name value to the name list as an option
             nameList.append("option").text(name).property("value", name);
         });
 
-        // saving the top name (the selected name) to pass into the plotting functions 
-        let name = names[0];
-
         // calling the plotting
-        hbar(name);
+        hbar(names[0]);
+        demoPanel(names[0])
     });
 }
 
@@ -40,40 +38,68 @@ function hbar(chosenName) {
 
         // creating array of samples then filtering to the selected record
         let samples = data.samples;
-        let selectedRecord = samples.filter((sample) => sample.id === chosenName);
+        let record = samples.filter((sample) => sample.id === chosenName);
         // checking if selected record is present
         // console.log(selectedRecord)
-
-        // selecting first record (otherwise you cannot slice it later on)
-        let record = selectedRecord[0];
         
         // creating trace for hbar chart
         let trace = [{
             // pulling top ten sample_values 
-            x: record.sample_values.slice(0,10).reverse(),
+            x: record[0].sample_values.slice(0,10).reverse(),
             // pulling top ten otu_ids and adding the 'OTU' label to y label
-            y: record.otu_ids.slice(0,10).map((otu_id) => `OTU ${otu_id}`).reverse(),
+            y: record[0].otu_ids.slice(0,10).map((otu_id) => `OTU ${otu_id}`).reverse(),
             // assigning bacteria description to display when hovering
-            text: record.otu_labels.slice(0,10).reverse(),
+            text: record[0].otu_labels.slice(0,10).reverse(),
             // selecting type of chart
             type: "bar",
             // changing orientation of bar chart
             orientation: 'h',
+            width: .7,
             // selecting color of bars in chart
             marker: {
-                color: "rgb(172,172,100)"
+                color: "green",  
             },
         }];
-        
+        let layout = {
+            title: (`Top 10 OTUs for Sample: ${record[0].id}`)
+        }
         // plot chart
-        Plotly.newPlot("bar", trace);
+        Plotly.newPlot("bar", trace, layout);
+    });
+}
+
+// DEMOGRAPHICS PANEL
+function demoPanel(chosenName) {
+    // pull data from json and console log it
+    d3.json(url).then((data) => {
+        console.log(`Data: ${data}`);
+
+        // pulling metadata portion of json and pulling selected record from metadata
+        let metadata = data.metadata;
+        let record = metadata.filter((meta) => meta.id == chosenName);
+        // console.log(selectedRecord)
+        
+        // remove sub elements from sample-metadata object
+        d3.select("#sample-metadata").html("");
+
+        // pull the keys and values from the top record
+        let fields = Object.entries(record[0]);
+        // checking what the fields array looks like
+        console.log(fields);
+
+        // add html elements with h5 tags for each field in the fields array...
+        //...information added in elements = "Key: Value"
+        fields.forEach(([key,value]) => {
+            d3.select("#sample-metadata").append("h5").text(`${key}: ${value}`);
+        });
     });
 }
 
 
 // updates horizontal bar chart when new name is selected
-function newNameSelected(chosenName) {
+function optionChanged(chosenName) {
     hbar(chosenName);
+    demoPanel(chosenName);
 }
 
 // calling wrapper function 
