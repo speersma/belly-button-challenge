@@ -27,6 +27,7 @@ function make_plot() {
         // calling the plotting
         hbar(names[0]);
         demoPanel(names[0])
+        bubble(names[0])
     });
 }
 
@@ -95,11 +96,27 @@ function demoPanel(chosenName) {
     });
 }
 
+// BUBBLE CHART 
+function bubble(chosenName) {
+    // pull in data from JSON and console log it
+    d3.json(url).then((data) => {
+        console.log(data)
+
+        let samples = data.samples;
+
+        let record = samples.filter((sample) => sample.id === chosenName);
+        console.log(record)
+        let trace = [{
+            x: 
+        }]
+    })
+}
 
 // updates horizontal bar chart when new name is selected
 function optionChanged(chosenName) {
     hbar(chosenName);
     demoPanel(chosenName);
+    bubble(chosenName)
 }
 
 // calling wrapper function 
