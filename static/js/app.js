@@ -104,19 +104,36 @@ function bubble(chosenName) {
 
         let samples = data.samples;
 
-        let record = samples.filter((sample) => sample.id === chosenName);
+        let selectedRecord = samples.filter((sample) => sample.id === chosenName);
+        let record = selectedRecord[0]
         console.log(record)
         let trace = [{
-            x: 
-        }]
+            x: record.otu_ids,
+            y: record.sample_values,
+            text: record.otu_labels,
+            mode: 'markers',
+            marker: {
+                size: record.sample_values,
+                color: record.otu_ids,
+                colorscale: 'Electric'
+            }
+        }];
+
+        let layout = {
+            title: "",
+            xaxis: {title: "OTU ID"}
+        };
+
+        Plotly.newPlot("bubble", trace, layout)
     })
 }
 
-// updates horizontal bar chart when new name is selected
+// updates charts when new name is selected
 function optionChanged(chosenName) {
     hbar(chosenName);
     demoPanel(chosenName);
-    bubble(chosenName)
+    bubble(chosenName);
+    
 }
 
 // calling wrapper function 
